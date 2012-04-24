@@ -8,7 +8,7 @@
   <logger name="org.hibernate.SQL" level="OFF" />
   <logger name="org.hibernate.tool.hbm2ddl" level="OFF" />
   <logger name="org.dbunit" level="ERROR" />
-  <logger name="ch.mobi" level="DEBUG" />
+  <logger name="com.boz.commons.test" level="DEBUG" />
 
   <root level="ERROR">
     <appender-ref ref="STDOUT" />

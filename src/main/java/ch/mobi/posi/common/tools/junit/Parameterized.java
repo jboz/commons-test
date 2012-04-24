@@ -62,12 +62,12 @@ public class Parameterized extends Suite {
     final List<Object[]> parametersList = getParametersList(getTestClass());
 
     for (int i = 0; i < parametersList.size(); i++) {
-      // on crÈe un runner pour chaque param√®tre
-      // ces runner n'exÈcuteront que les mÈthodes paramÈtrÈes
+      // on cr√©e un runner pour chaque param√®tre
+      // ces runner n'ex√©cuteront que les m√©thodes param√©tr√©es
       runners.add(new TestClassRunnerWithParameters(klass, parametersList.get(i), i));
     }
     if (!CollectionUtils.isEmpty(new TestClass(klass).getAnnotatedMethods(Test.class))) {
-      // on ajoute un runner classique pour les autres mÈthodes de test
+      // on ajoute un runner classique pour les autres m√©thodes de test
       runners.add(new BlockJUnit4ClassRunner(klass) {
 
         @Override
@@ -132,7 +132,7 @@ public class Parameterized extends Suite {
 
     @Override
     protected List<FrameworkMethod> computeTestMethods() {
-      // exÈcute uniquement les mÈthodes paramÈtrÈes
+      // ex√©cute uniquement les m√©thodes param√©tr√©es
       return getTestClass().getAnnotatedMethods(TestParameterized.class);
     }
 
@@ -165,7 +165,7 @@ public class Parameterized extends Suite {
       return new Statement() {
         @Override
         public void evaluate() throws Throwable {
-          // exÈcution de la mÈthode avec param√®tres
+          // ex√©cution de la m√©thode avec param√®tres
           if (LOG.isTraceEnabled()) {
             LOG.debug(" test no=" + fParameterSetNumber + ", values : " + ArrayUtils.toString(values));
           } else {

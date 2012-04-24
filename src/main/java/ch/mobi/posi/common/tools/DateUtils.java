@@ -59,7 +59,7 @@ public final class DateUtils {
     return new SimpleDateFormat(dateFormat);
   }
 
-  // d�fini après le thread local !
+  // défini après le thread local !
   /** date min */
   public static Date MIN_VALUE = parse("01.01.0001");
   /** date max */

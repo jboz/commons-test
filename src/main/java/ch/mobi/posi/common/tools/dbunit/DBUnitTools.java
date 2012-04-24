@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * SÈparation des mÈthodes utilitaires.
+ * S√©paration des m√©thodes utilitaires.
  * 
  * @author jboz
  */
@@ -60,16 +60,16 @@ public final class DBUnitTools {
       final EntityManager entityManager = createFactory(testObject).createEntityManager();
 
       if (EntityManager.class.equals(field.getType())) {
-        // EntityManager directement injectÈ
+        // EntityManager directement inject√©
         setFieldValue(testObject, field, entityManager);
       } else {
-        // on est dans le cas d'une dÈpendance
+        // on est dans le cas d'une d√©pendance
         final Field subField = getFieldByType(field.getType(), EntityManager.class);
         if (subField != null) {
           Object dependance = getFieldValue(testObject, field);
           if (dependance == null) {
             try {
-              // on instancie la dÈpendance si null
+              // on instancie la d√©pendance si null
               dependance = field.getType().newInstance();
               setFieldValue(testObject, field, dependance);
 
@@ -77,7 +77,7 @@ public final class DBUnitTools {
               new IllegalArgumentException(e);
             }
           }
-          // on attribue un EntityManager √† cette dÈpendance
+          // on attribue un EntityManager √† cette d√©pendance
           setFieldValue(dependance, subField, entityManager);
         }
       }
@@ -87,7 +87,7 @@ public final class DBUnitTools {
   }
 
   /**
-   * CrÈation du context JPA.
+   * Cr√©ation du context JPA.
    */
   private static EntityManagerFactory createFactory(final Object testObject) {
     final JpaConfig jpaConfig = testObject.getClass().getAnnotation(JpaConfig.class);
@@ -96,7 +96,7 @@ public final class DBUnitTools {
   }
 
   /**
-   * CrÈation du data set.
+   * Cr√©ation du data set.
    */
   public static IDataSet getDataSet(final Method testMethod, final Object testObject) throws MalformedURLException,
       DataSetException {
@@ -133,7 +133,7 @@ public final class DBUnitTools {
   }
 
   /**
-   * CrÈation d'une datasource basÈ sur les propriÈtÈs JPA.
+   * Cr√©ation d'une datasource bas√© sur les propri√©t√©s JPA.
    */
   private static DataSource createDataSource(final EntityManagerFactory factory) {
     final String driverClassName = (String) factory.getProperties().get("hibernate.connection.driver_class");
@@ -186,7 +186,7 @@ public final class DBUnitTools {
   }
 
   /**
-   * Ferme l'acc√®s aux donnÈes.
+   * Ferme l'acc√®s aux donn√©es.
    */
   public static void closePersistenceContext(EntityManager entityManager) {
     if (entityManager != null) {

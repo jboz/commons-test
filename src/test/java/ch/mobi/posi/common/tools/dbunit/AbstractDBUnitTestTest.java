@@ -19,7 +19,7 @@ public class AbstractDBUnitTestTest extends AbstractDBUnitTest {
     assertThat(em).isNotNull();
     final MyEntity entity = em.find(MyEntity.class, 1l);
     assertEquals(Long.valueOf(1), entity.getId());
-    assertEquals("Hervé", entity.getName());
+    assertEquals("HervÃ©", entity.getName());
   }
 
   @Test

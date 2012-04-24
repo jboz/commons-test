@@ -62,7 +62,7 @@ public class DateUtilsTest {
 
     assertThat(DateUtils.parse("31.12.2015")).isEqualTo(createDate(2015, 12, 31));
 
-    assertThat(DateUtils.parse("25 D�cembre 2015 à 10h20", "dd MMMM yyyy 'à' hh'h'mm")).isEqualTo(
+    assertThat(DateUtils.parse("25 Décembre 2015 à 10h20", "dd MMMM yyyy 'à' hh'h'mm")).isEqualTo(
         createDate(2015, 12, 25, 10, 20, 0, 0));
   }
 
@@ -80,7 +80,7 @@ public class DateUtilsTest {
 
     assertThat(DateUtils.parseDateTime("31.12.2015", DateUtils.FR_DATE_FORMAT).toDate()).isEqualTo(createDate(2015, 12, 31));
 
-    assertThat(DateUtils.parseDateTime("25 D�cembre 2015 à 10h20", "dd MMMM yyyy 'à' hh'h'mm").toDate()).isEqualTo(
+    assertThat(DateUtils.parseDateTime("25 Décembre 2015 à 10h20", "dd MMMM yyyy 'à' hh'h'mm").toDate()).isEqualTo(
         createDate(2015, 12, 25, 10, 20, 0, 0));
   }
 

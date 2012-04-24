@@ -11,7 +11,7 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 /**
- * Permet de ne pas définir de runner ni de classe abstraite :
+ * Permet de ne pas dÃ©finir de runner ni de classe abstraite :
  * 
  * <pre>
  * <code>

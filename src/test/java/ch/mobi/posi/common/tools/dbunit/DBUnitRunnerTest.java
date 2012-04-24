@@ -26,7 +26,7 @@ public class DBUnitRunnerTest {
     assertThat(em).isNotNull();
     final MyEntity entity = em.find(MyEntity.class, 1l);
     assertEquals(Long.valueOf(1), entity.getId());
-    assertEquals("Hervé", entity.getName());
+    assertEquals("HervÃ©", entity.getName());
   }
 
   @Test
@@ -113,9 +113,9 @@ public class DBUnitRunnerTest {
     @SuppressWarnings("unchecked")
     final List<MyEntity> entities = em.createNativeQuery("select * from MyEntity order by id asc", MyEntity.class)
         .getResultList();
-    // maintenant 3 entités en base
+    // maintenant 3 entitÃ©s en base
     assertThat(entities).hasSize(4);
-    assertThat(entities.get(0).getName()).isEqualTo("Hervé");
+    assertThat(entities.get(0).getName()).isEqualTo("HervÃ©");
     assertThat(entities.get(1).getName()).isEqualTo("Jimi");
     assertThat(entities.get(2).getName()).isEqualTo("Pierre");
     assertThat(entities.get(3).getName()).isEqualTo("a new One");

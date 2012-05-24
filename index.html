@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Commons-test : Utilitaires for testing" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Commons-test</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/jboz/commons-test">View on GitHub</a>
+
+          <h1 id="project_title">Commons-test</h1>
+          <h2 id="project_tagline">Utilitaires for testing</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/jboz/commons-test/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/jboz/commons-test/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>Wiki page of this test tools.</h3>
+
+<p>This project give some lite tools for test unit writing.
+It's base on framework <a href="http://www.junit.org/">JUnit</a>, <a href="http://www.dbunit.org/">DBUnit</a> and <a href="http://code.google.com/p/mockito/">Mockito</a>.</p>
+
+<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+
+<h3>JUnit features :</h3>
+
+<pre><code>@RunWith(Parameterized.class)
+public class ParameterizedTest {
+
+  private final MyService service = new MyService();
+
+  @Parameters
+  public static Collection&lt;Object[]&gt; datas1() {
+    final Collection&lt;Object[]&gt; datas = new ArrayList&lt;Object[]&gt;();
+
+    datas.add(new Object[] { "Paul", "Hello, Paul", 1, new Object[] { "test", Double.valueOf(2.54689) } });
+    datas.add(new Object[] { "Jack", "Hello, Jack", 2, new String[] {} });
+    datas.add(new Object[] { "my name is Patty  !", "Hello, my name is Patty  !", 5, null });
+
+    return datas;
+  }
+
+  @TestParameterized
+  public void testGreet(final String name, final String expected, final int cpt, final Object[] vals) {
+    System.out.println(cpt + ", " + ToStringBuilder.reflectionToString(vals, ToStringStyle.SHORT_PREFIX_STYLE));
+    assertThat(service.greet(name)).isEqualTo(expected);
+  }
+}
+</code></pre>
+
+<h3>Mockito features :</h3>
+
+<p><strong>Based on JUnit rule</strong></p>
+
+<pre><code>public class MockingRuleTest {
+
+  @Rule
+  public MockingRule rule = MockingRule.init();
+
+  @Mock
+  private MyService mock;
+
+  @Spy
+  private MyService spy;
+
+  @Test
+  public void testRule() {
+    assertThat(MockingRule.init()).isNotNull();
+
+    assertThat(mock).isNotNull();
+    assertThat(spy).isNotNull();
+  }
+}
+</code></pre>
+
+<h3>DBUnit features :</h3>
+
+<p>Load datas with <strong>@DataSet</strong>, automaticly inject EntityManager if defined int class :</p>
+
+<pre><code>@DataSet("entities")
+public class DBUnitRuleTest {
+
+  private EntityManager em;
+
+  @Test
+  @DataSet("datas/others")
+  public void testLoadOthers() {
+    assertThat(em).isNotNull();
+    final MyEntity entity = em.find(MyEntity.class, 20l);
+    assertEquals(Long.valueOf(20), entity.getId());
+    assertEquals("Pierre", entity.getName());
+  }
+}
+</code></pre>
+
+<p><strong>@DataSet</strong> can be defined for the entire class and/or for a specific method.</p>
+
+<p>To activate DBUnit, 3 ways
+<strong>a JUnit rule :</strong></p>
+
+<pre><code>  @Rule
+  public DBUnitRule dbUnitRule = DBUnitRule.init();
+</code></pre>
+
+<p><strong>an abstract class :</strong></p>
+
+<pre><code>public class AbstractDBUnitTestTest extends AbstractDBUnitTest {
+</code></pre>
+
+<p><strong>a runner :</strong></p>
+
+<pre><code>@RunWith(DBUnitRunner.class)
+public class DBUnitRunnerTest {
+</code></pre>
+
+<p>You can define the rollback strategy with @Transactionnal.
+You can redefined JPA config with @JpaConfig (by default the unit persistence name is 'pu-test').
+<em>note that you can not even change the persistence.xml file name, but soon I hope :)</em></p>
+
+<h3>Support or Contact</h3>
+
+<p>Julien Boz : "julienboz" on gmail ;)</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Commons-test maintained by <a href="https://github.com/jboz">jboz</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>

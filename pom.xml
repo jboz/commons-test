@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.boz.commons</groupId>
   <artifactId>commons-test</artifactId>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
 
   <properties>
     <compileSource>1.6</compileSource>

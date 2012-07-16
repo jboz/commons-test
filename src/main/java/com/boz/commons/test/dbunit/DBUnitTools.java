@@ -1,6 +1,5 @@
 package com.boz.commons.test.dbunit;
 
-import static com.boz.commons.test.ReflectionUtils.getFieldAnnotatedWith;
 import static com.boz.commons.test.ReflectionUtils.getFieldByType;
 import static com.boz.commons.test.ReflectionUtils.getFieldValue;
 import static com.boz.commons.test.ReflectionUtils.getMethodOrClassLevelAnnotation;
@@ -38,160 +37,170 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Séparation des méthodes utilitaires.
- * 
+ *
  * @author jboz
  */
 public final class DBUnitTools {
-  private static final Logger LOG = LoggerFactory.getLogger(DBUnitTools.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DBUnitTools.class);
 
-  /**
-   * Injection de {@link EntityManager}.
-   * 
-   * @throws IllegalAccessException
-   * @throws InstantiationException
-   */
-  public static EntityManager injectEntityManager(final Object testObject) {
-    Field field = getFieldByType(testObject.getClass(), EntityManager.class);
-    if (field == null) {
-      field = getFieldAnnotatedWith(testObject.getClass(), ToInject.class);
-    }
+	private DBUnitTools() {
+	}
 
-    if (field != null) {
-      final EntityManager entityManager = createFactory(testObject).createEntityManager();
+	/**
+	 * Injection de {@link EntityManager}.
+	 *
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 */
+	public static EntityManager injectEntityManager(final Object testObject) {
 
-      if (EntityManager.class.equals(field.getType())) {
-        // EntityManager directement injecté
-        setFieldValue(testObject, field, entityManager);
-      } else {
-        // on est dans le cas d'une dépendance
-        final Field subField = getFieldByType(field.getType(), EntityManager.class);
-        if (subField != null) {
-          Object dependance = getFieldValue(testObject, field);
-          if (dependance == null) {
-            try {
-              // on instancie la dépendance si null
-              dependance = field.getType().newInstance();
-              setFieldValue(testObject, field, dependance);
+		final EntityManager entityManager = createFactory(testObject).createEntityManager();
 
-            } catch (final Exception e) {
-              new IllegalArgumentException(e);
-            }
-          }
-          // on attribue un EntityManager à cette dépendance
-          setFieldValue(dependance, subField, entityManager);
-        }
-      }
-      return entityManager;
-    }
-    return null;
-  }
+		// on va setter l'entity manager
+		final Field field = getNext(testObject.getClass());
 
-  /**
-   * Création du context JPA.
-   */
-  private static EntityManagerFactory createFactory(final Object testObject) {
-    final JpaConfig jpaConfig = testObject.getClass().getAnnotation(JpaConfig.class);
+		if (EntityManager.class.equals(field.getType())) {
+			// soit directement comme attribut
+			setFieldValue(testObject, field, entityManager);
 
-    return Persistence.createEntityManagerFactory(jpaConfig == null ? "pu-test" : jpaConfig.persistenceUnit());
-  }
+		} else if (field.getAnnotation(InjectEntiyManager.class) != null) {
+			// soit dans une dépendance annotée @InjectEntiyManager
 
-  /**
-   * Création du data set.
-   */
-  public static IDataSet getDataSet(final Method testMethod, final Object testObject) throws MalformedURLException,
-      DataSetException {
-    final Class<?> testClass = testObject.getClass();
-    final DataSet dataSetAnnotation = getMethodOrClassLevelAnnotation(DataSet.class, testMethod, testClass);
-    if (dataSetAnnotation == null) {
-      // No @DataSet annotation found
-      return null;
-    }
-    final List<IDataSet> dataSets = new ArrayList<IDataSet>();
+			final Field fieldEntityManager = getFieldByType(field.getType(), EntityManager.class);
+			if (fieldEntityManager != null) {
+				// cette dépendance contient bien un champ entity manager
+				Object dependance = getFieldValue(testObject, field);
+				if (dependance == null) {
+					try {
+						// on instancie la dépendance si null
+						dependance = field.getType().newInstance();
+						setFieldValue(testObject, field, dependance);
+					} catch (final Exception e) {
+						new IllegalArgumentException(e);
+					}
+				}
+				// on attribue un EntityManager à cette dépendance
+				setFieldValue(dependance, fieldEntityManager, entityManager);
+			}
+		}
+		return entityManager;
+	}
 
-    final FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder().setDtdMetadata(false).setColumnSensing(true);
-    for (final String dataSetName : dataSetAnnotation.value()) {
-      dataSets.add(builder.build(DataSetResolver.resolve(testClass, dataSetName)));
-    }
+	private static Field getNext(final Class<? extends Object> clazz) {
+		for (final Field field : clazz.getDeclaredFields()) {
+			if (EntityManager.class.equals(field.getType()) || field.getAnnotation(InjectEntiyManager.class) != null) {
+				return field;
+			}
+		}
+		return null;
+	}
 
-    final ReplacementDataSet replacementDataSet = new ReplacementDataSet(new CompositeDataSet(
-        (IDataSet[]) dataSets.toArray(new IDataSet[dataSets.size()])));
+	/**
+	 * Création du context JPA.
+	 */
+	private static EntityManagerFactory createFactory(final Object testObject) {
+		final JpaConfig jpaConfig = testObject.getClass().getAnnotation(JpaConfig.class);
 
-    replacementDataSet.addReplacementObject("[NULL]", null);
-    replacementDataSet.addReplacementObject("[NOW]", Calendar.getInstance().getTime());
+		return Persistence.createEntityManagerFactory(jpaConfig == null ? "pu-test" : jpaConfig.persistenceUnit());
+	}
 
-    replacementDataSet.setStrictReplacement(true);
+	/**
+	 * Création du data set.
+	 */
+	public static IDataSet getDataSet(final Method testMethod, final Object testObject) throws MalformedURLException,
+			DataSetException {
+		final Class<?> testClass = testObject.getClass();
+		final DataSet dataSetAnnotation = getMethodOrClassLevelAnnotation(DataSet.class, testMethod, testClass);
+		if (dataSetAnnotation == null) {
+			// No @DataSet annotation found
+			return null;
+		}
+		final List<IDataSet> dataSets = new ArrayList<IDataSet>();
 
-    return replacementDataSet;
-  }
+		final FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder().setDtdMetadata(false).setColumnSensing(true);
+		for (final String dataSetName : dataSetAnnotation.value()) {
+			dataSets.add(builder.build(DataSetResolver.resolve(testClass, dataSetName)));
+		}
 
-  /**
-   * Insertion du jeu de test.
-   */
-  private static void insertDataSet(final IDatabaseConnection connection, final IDataSet dataSet) throws SQLException,
-      DatabaseUnitException {
-    DatabaseOperation.CLEAN_INSERT.execute(connection, dataSet);
-  }
+		final ReplacementDataSet replacementDataSet = new ReplacementDataSet(new CompositeDataSet(
+				dataSets.toArray(new IDataSet[dataSets.size()])));
 
-  /**
-   * Création d'une datasource basé sur les propriétés JPA.
-   */
-  private static DataSource createDataSource(final EntityManagerFactory factory) {
-    final String driverClassName = (String) factory.getProperties().get("hibernate.connection.driver_class");
-    final String databaseUrl = (String) factory.getProperties().get("hibernate.connection.url");
-    final String userName = (String) factory.getProperties().get("hibernate.connection.username");
-    final String password = (String) factory.getProperties().get("hibernate.connection.password");
+		replacementDataSet.addReplacementObject("[NULL]", null);
+		replacementDataSet.addReplacementObject("[NOW]", Calendar.getInstance().getTime());
 
-    LOG.info("Creating data source. Driver: " + driverClassName + ", url: " + databaseUrl + ", user: " + userName
-        + ", password: <not shown>");
-    final BasicDataSource dataSource = new BasicDataSource();
-    dataSource.setDriverClassName(driverClassName);
-    dataSource.setUsername(userName);
-    dataSource.setPassword(password);
-    dataSource.setUrl(databaseUrl);
+		replacementDataSet.setStrictReplacement(true);
 
-    return dataSource;
-  }
+		return replacementDataSet;
+	}
 
-  /**
-   * Insertion du jeu de test.
-   */
-  public static void insertDataSet(final EntityManager entityManager, final Method testMethod, final Object testObject) {
-    IDatabaseConnection connection = null;
-    try {
-      final IDataSet dataSet = getDataSet(testMethod, testObject);
-      if (dataSet == null) {
-        // no dataset specified
-        return;
-      }
-      connection = new DatabaseConnection(createDataSource(entityManager.getEntityManagerFactory()).getConnection());
-      connection.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new DefaultDataTypeFactory() {
-        @Override
-        public Collection<String> getValidDbProducts() {
-          return Arrays.asList(new String[] { "hsql", "oracle", "db2", "h2" });
-        }
-      });
-      insertDataSet(connection, dataSet);
+	/**
+	 * Insertion du jeu de test.
+	 */
+	private static void insertDataSet(final IDatabaseConnection connection, final IDataSet dataSet) throws SQLException,
+			DatabaseUnitException {
+		DatabaseOperation.CLEAN_INSERT.execute(connection, dataSet);
+	}
 
-    } catch (final Exception e) {
-      throw new IllegalArgumentException("Error inserting test data from DbUnit dataset for method " + testMethod, e);
-    } finally {
-      // ferme la connection à la base.
-      if (connection != null) {
-        try {
-          connection.close();
-        } catch (final SQLException e) {
-        }
-      }
-    }
-  }
+	/**
+	 * Création d'une datasource basé sur les propriétés JPA.
+	 */
+	private static DataSource createDataSource(final EntityManagerFactory factory) {
+		final String driverClassName = (String) factory.getProperties().get("hibernate.connection.driver_class");
+		final String databaseUrl = (String) factory.getProperties().get("hibernate.connection.url");
+		final String userName = (String) factory.getProperties().get("hibernate.connection.username");
+		final String password = (String) factory.getProperties().get("hibernate.connection.password");
 
-  /**
-   * Ferme l'accès aux données.
-   */
-  public static void closePersistenceContext(EntityManager entityManager) {
-    if (entityManager != null) {
-      // ferme via la factory
-      entityManager.getEntityManagerFactory().close();
-    }
-  }
+		LOG.info("Creating data source. Driver: " + driverClassName + ", url: " + databaseUrl + ", user: " + userName
+				+ ", password: <not shown>");
+		final BasicDataSource dataSource = new BasicDataSource();
+		dataSource.setDriverClassName(driverClassName);
+		dataSource.setUsername(userName);
+		dataSource.setPassword(password);
+		dataSource.setUrl(databaseUrl);
+
+		return dataSource;
+	}
+
+	/**
+	 * Insertion du jeu de test.
+	 */
+	public static void insertDataSet(final EntityManager entityManager, final Method testMethod, final Object testObject) {
+		IDatabaseConnection connection = null;
+		try {
+			final IDataSet dataSet = getDataSet(testMethod, testObject);
+			if (dataSet == null) {
+				// no dataset specified
+				return;
+			}
+			connection = new DatabaseConnection(createDataSource(entityManager.getEntityManagerFactory()).getConnection());
+			connection.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new DefaultDataTypeFactory() {
+				@Override
+				public Collection<String> getValidDbProducts() {
+					return Arrays.asList(new String[] { "hsql", "oracle", "db2", "h2" });
+				}
+			});
+			insertDataSet(connection, dataSet);
+
+		} catch (final Exception e) {
+			throw new IllegalArgumentException("Error inserting test data from DbUnit dataset for method " + testMethod, e);
+		} finally {
+			// ferme la connection à la base.
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (final SQLException e) {
+				}
+			}
+		}
+	}
+
+	/**
+	 * Ferme l'accès aux données.
+	 */
+	public static void closePersistenceContext(final EntityManager entityManager) {
+		if (entityManager != null) {
+			// ferme via la factory
+			entityManager.getEntityManagerFactory().close();
+		}
+	}
 }

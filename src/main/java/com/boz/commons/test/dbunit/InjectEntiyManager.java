@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Target({ TYPE, METHOD })
 @Retention(RUNTIME)
 @Inherited
-public @interface ToInject {
+public @interface InjectEntiyManager {
 }

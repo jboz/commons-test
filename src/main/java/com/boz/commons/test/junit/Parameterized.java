@@ -24,7 +24,7 @@ import org.junit.runners.model.TestClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.boz.commons.test.DateUtils;
+import com.javaboz.commons.test.DateUtils;
 
 
 /**
@@ -34,7 +34,7 @@ import com.boz.commons.test.DateUtils;
  * This mix JUnit {@link org.junit.runners.Parameterized} and {@link Theories}.
  * </p>
  * For example, to test a Fibonacci function, write:
- * 
+ *
  * <pre>
  * &#064;RunWith(Parameterized.class)
  * public class FibonacciTest {
@@ -42,7 +42,7 @@ import com.boz.commons.test.DateUtils;
  *   public static List&lt;Object[]&gt; data() {
  *     return Arrays.asList(new Object[][] { { 0, 0 }, { 1, 1 }, { 2, 1 }, { 3, 2 }, { 4, 3 }, { 5, 5 }, { 6, 8 } });
  *   }
- * 
+ *
  *   &#064;Theory
  *   public void test(int fInput, int fExpected) {
  *     assertEquals(fExpected, Fibonacci.compute(fInput));
@@ -58,7 +58,7 @@ public class Parameterized extends Suite {
   /**
    * Only called reflectively. Do not use programmatically.
    */
-  public Parameterized(Class<?> klass) throws Throwable {
+  public Parameterized(final Class<?> klass) throws Throwable {
     super(klass, Collections.<Runner> emptyList());
     final List<Object[]> parametersList = getParametersList(getTestClass());
 
@@ -96,10 +96,11 @@ public class Parameterized extends Suite {
 
   private FrameworkMethod getParametersMethod(final TestClass testClass) throws Exception {
     final List<FrameworkMethod> methods = testClass.getAnnotatedMethods(Parameters.class);
-    for (FrameworkMethod each : methods) {
+    for (final FrameworkMethod each : methods) {
       final int modifiers = each.getMethod().getModifiers();
-      if (Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers))
-        return each;
+      if (Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) {
+				return each;
+			}
     }
 
     throw new Exception("No public static parameters method on class " + testClass.getName());
@@ -125,7 +126,7 @@ public class Parameterized extends Suite {
 
     private final Object[] fParameterList;
 
-    private TestClassRunnerWithParameters(Class<?> type, Object[] parameterList, int i) throws InitializationError {
+    private TestClassRunnerWithParameters(final Class<?> type, final Object[] parameterList, final int i) throws InitializationError {
       super(type);
       fParameterList = parameterList;
       fParameterSetNumber = i;
@@ -138,12 +139,14 @@ public class Parameterized extends Suite {
     }
 
     @Override
-    protected void validateTestMethods(List<Throwable> errors) {
-      for (FrameworkMethod each : computeTestMethods())
-        if (each.getAnnotation(TestParameterized.class) != null)
-          each.validatePublicVoid(false, errors);
-        else
-          each.validatePublicVoidNoArg(false, errors);
+    protected void validateTestMethods(final List<Throwable> errors) {
+      for (final FrameworkMethod each : computeTestMethods()) {
+				if (each.getAnnotation(TestParameterized.class) != null) {
+					each.validatePublicVoid(false, errors);
+				} else {
+					each.validatePublicVoidNoArg(false, errors);
+				}
+			}
     }
 
     @Override
@@ -157,7 +160,7 @@ public class Parameterized extends Suite {
     }
 
     @Override
-    protected Statement methodInvoker(FrameworkMethod method, Object test) {
+    protected Statement methodInvoker(final FrameworkMethod method, final Object test) {
       return methodCompletesWithParameters(method, test, fParameterList);
     }
 
@@ -186,7 +189,7 @@ public class Parameterized extends Suite {
     builder.append("{");
     if (params != null) {
       for (int i = 0; i < params.length; i++) {
-        Object param = params[i];
+        final Object param = params[i];
         if (i > 0) {
           builder.append(", ");
         }

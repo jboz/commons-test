@@ -1,9 +1,9 @@
 package com.boz.commons.test.dbunit;
 
-import static com.boz.commons.test.ReflectionUtils.getFieldByType;
-import static com.boz.commons.test.ReflectionUtils.getFieldValue;
-import static com.boz.commons.test.ReflectionUtils.getMethodOrClassLevelAnnotation;
-import static com.boz.commons.test.ReflectionUtils.setFieldValue;
+import static com.javaboz.commons.test.ReflectionUtils.getFieldByType;
+import static com.javaboz.commons.test.ReflectionUtils.getFieldValue;
+import static com.javaboz.commons.test.ReflectionUtils.getMethodOrClassLevelAnnotation;
+import static com.javaboz.commons.test.ReflectionUtils.setFieldValue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

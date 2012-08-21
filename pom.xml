@@ -118,6 +118,11 @@
 			<version>1.3</version>
 		</dependency>
 		<dependency>
+			<groupId>com.javaboz.commons</groupId>
+			<artifactId>commons</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<version>1.9.0</version>

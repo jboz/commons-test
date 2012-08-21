@@ -11,11 +11,11 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
-import com.boz.commons.test.ReflectionUtils;
+import com.javaboz.commons.test.ReflectionUtils;
 
 /**
  * Runner JUnit pour utiliser DBUnit.
- * 
+ *
  * @author jboz
  */
 public class DBUnitRunner extends BlockJUnit4ClassRunner {
@@ -34,7 +34,7 @@ public class DBUnitRunner extends BlockJUnit4ClassRunner {
 	/**
 	 * Junit statement that inject EntityManager and start transaction (if required) before test and close EntityManager and
 	 * commit/rollback transaction (if required) after test.
-	 * 
+	 *
 	 * @author jboz
 	 */
 	private static class DBUnitStatement extends Statement {
@@ -59,7 +59,7 @@ public class DBUnitRunner extends BlockJUnit4ClassRunner {
 
 	/**
 	 * Execute test with DBUnit environment.
-	 * 
+	 *
 	 * @param statement : test to execute
 	 * @param method : test method
 	 * @param testObject : tested object
@@ -72,7 +72,7 @@ public class DBUnitRunner extends BlockJUnit4ClassRunner {
 
 	/**
 	 * Execute test with DBUnit environment.
-	 * 
+	 *
 	 * @param statement : test to execute
 	 * @param method : test method
 	 * @param testObject : tested object

@@ -107,4 +107,4 @@ You can redefined JPA config with @JpaConfig (by default the unit persistence na
 _note that you can not even change the persistence.xml file name, but soon I hope :)_
 
 ### Support or Contact
-Julien Boz : "julienboz" on gmail ;)
+Create an issue on Guthub, or a pull request ;)
